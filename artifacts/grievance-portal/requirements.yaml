@@ -1,0 +1,19 @@
+packages:
+  "framer-motion": "For smooth page transitions and micro-interactions"
+  "recharts": "For admin dashboard analytics charts"
+  "date-fns": "For formatting timestamps"
+  "react-hook-form": "For robust form state management"
+  "@hookform/resolvers": "For Zod schema validation in forms"
+  "zod": "For defining client-side form schemas"
+  "clsx": "For conditional tailwind class joining"
+  "tailwind-merge": "For conflict-free tailwind class joining"
+
+images:
+  - path: "artifacts/grievance-portal/public/images/hero-campus.png"
+    description: "Abstract modern geometric illustration of a university campus building with soft indigo and blue gradients, premium academic feel, clean and minimal"
+    aspect_ratio: "16:9"
+
+notes:
+  - JWT Auth token is stored in localStorage as 'token'
+  - The API hooks accept an options object where we can pass headers for Auth
+  - The app uses Wouter for routing
