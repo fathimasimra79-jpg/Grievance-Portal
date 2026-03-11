@@ -21,7 +21,7 @@ export default function Login({ role }: { role: 'student' | 'admin' | 'departmen
   
   const { register, handleSubmit, formState: { errors } } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: role !== 'student' ? { email: 'admin@university.edu', password: 'admin123' } : {}
+    defaultValues: {}
   });
 
   const onSubmit = (data: z.infer<typeof schema>) => {
@@ -64,7 +64,7 @@ export default function Login({ role }: { role: 'student' | 'admin' | 'departmen
                 <Label htmlFor="email">Email Address</Label>
                 <Input 
                   id="email" 
-                  placeholder="name@example.com" 
+                  placeholder="Enter your email" 
                   {...register("email")}
                   className={errors.email ? "border-destructive focus-visible:ring-destructive/20" : ""}
                 />
@@ -76,7 +76,7 @@ export default function Login({ role }: { role: 'student' | 'admin' | 'departmen
                 <Input 
                   id="password" 
                   type="password" 
-                  placeholder="••••••••" 
+                  placeholder="Enter your password" 
                   {...register("password")}
                   className={errors.password ? "border-destructive focus-visible:ring-destructive/20" : ""}
                 />
