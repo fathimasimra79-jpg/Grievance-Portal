@@ -6,7 +6,7 @@ import { signToken, hashPassword, comparePassword, authenticate, AuthRequest } f
 const router = Router();
 
 const ADMIN_EMAIL = "admin@university.edu";
-const ADMIN_PASSWORD = "admin123";
+const ADMIN_PASSWORD = "admin@2026";
 
 router.post("/register", async (req, res) => {
   try {

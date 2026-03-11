@@ -34,8 +34,8 @@ artifacts-monorepo/
 ## Authentication
 
 - **Students**: Register with name/email/password, login with role=student
-- **Admin**: email=admin@university.edu, password=admin123, role=admin
-- **Department**: email=admin@university.edu, password=admin123, role=department
+- **Admin**: email=admin@university.edu, password=admin@2026, role=admin
+- **Department**: email=admin@university.edu, password=admin@2026, role=department
 - JWT stored in localStorage as 'token'
 
 ## Database Tables
