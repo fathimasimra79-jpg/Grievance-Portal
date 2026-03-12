@@ -19,6 +19,14 @@ async function getAdminId(): Promise<number | null> {
   return admins.length > 0 ? admins[0].id : null;
 }
 
+async function getDepartmentUserId(departmentName: string): Promise<number | null> {
+  const deptUsers = await db.select()
+    .from(usersTable)
+    .where(and(eq(usersTable.role, "department"), eq(usersTable.department, departmentName)))
+    .limit(1);
+  return deptUsers.length > 0 ? deptUsers[0].id : null;
+}
+
 router.get("/", authenticate, async (req: AuthRequest, res) => {
   try {
     const user = req.user!;
@@ -43,14 +51,17 @@ router.get("/", authenticate, async (req: AuthRequest, res) => {
     let filtered = allComplaints;
 
     if (user.role === "student") {
+      // Students see only their own complaints
       filtered = filtered.filter(c => c.studentId === user.id);
     } else if (user.role === "department") {
-      filtered = filtered.filter(c => c.department != null);
+      // Department users see ONLY complaints assigned to their specific department
+      filtered = filtered.filter(c => c.department === user.department);
     }
+    // Admin sees all complaints (no filter)
 
     if (status) filtered = filtered.filter(c => c.status === status);
     if (category) filtered = filtered.filter(c => c.category === category);
-    if (department) filtered = filtered.filter(c => c.department === department);
+    if (department && user.role === "admin") filtered = filtered.filter(c => c.department === department);
 
     return res.json({ complaints: filtered, total: filtered.length });
   } catch (err) {
@@ -74,13 +85,13 @@ router.post("/", authenticate, requireRole("student"), async (req: AuthRequest, 
       status: "Pending",
     }).returning();
 
+    // Notify admin of new complaint
     const adminId = await getAdminId();
     if (adminId) {
       await notifyUser(adminId, `New complaint submitted: "${title}" by ${user.name}`, complaint.id);
     }
 
-    const studentName = user.name;
-    return res.status(201).json({ ...complaint, studentName });
+    return res.status(201).json({ ...complaint, studentName: user.name });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Internal server error" });
@@ -129,25 +140,33 @@ router.patch("/:id", authenticate, requireRole("admin", "department"), async (re
     }
     const complaint = existing[0];
 
-    const updates: Partial<typeof complaintsTable.$inferSelect> = {};
+    const updates: Record<string, string> = {};
     if (status) updates.status = status;
     if (department) updates.department = department;
 
     const [updated] = await db.update(complaintsTable).set(updates).where(eq(complaintsTable.id, id)).returning();
 
+    // Notify department user when assigned
     if (department && department !== complaint.department) {
+      // Notify the specific department user
+      const deptUserId = await getDepartmentUserId(department);
+      if (deptUserId) {
+        await notifyUser(deptUserId, `Complaint #${id} "${complaint.title}" has been assigned to your department.`, id);
+      }
+      // Also notify the student
       await notifyUser(complaint.studentId, `Your complaint "${complaint.title}" has been assigned to the ${department} department.`, id);
     }
 
+    // Notify student on status change
     if (status && status !== complaint.status) {
       await notifyUser(complaint.studentId, `Your complaint "${complaint.title}" status updated to: ${status}`, id);
       if (status === "Resolved") {
-        await notifyUser(complaint.studentId, `Your complaint "${complaint.title}" has been resolved! Please provide feedback.`, id);
+        await notifyUser(complaint.studentId, `Your complaint "${complaint.title}" has been resolved! Please leave feedback.`, id);
       }
     }
 
-    const studentName = (await db.select({ name: usersTable.name }).from(usersTable).where(eq(usersTable.id, updated.studentId)).limit(1))[0]?.name;
-    return res.json({ ...updated, studentName });
+    const studentRow = await db.select({ name: usersTable.name }).from(usersTable).where(eq(usersTable.id, updated.studentId)).limit(1);
+    return res.json({ ...updated, studentName: studentRow[0]?.name ?? "" });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Internal server error" });

@@ -49,7 +49,9 @@ export function Layout({ children }: LayoutProps) {
           </div>
           <div>
             <h1 className="font-display font-bold text-lg leading-tight">Grievance Portal</h1>
-            <p className="text-xs text-muted-foreground capitalize">{user.role} Panel</p>
+            <p className="text-xs text-muted-foreground capitalize">
+              {(user as any).department ? (user as any).department : user.role} Panel
+            </p>
           </div>
         </div>
 

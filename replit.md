@@ -35,12 +35,19 @@ artifacts-monorepo/
 
 - **Students**: Register with name/email/password, login with role=student
 - **Admin**: email=admin@university.edu, password=admin@2026, role=admin
-- **Department**: email=admin@university.edu, password=admin@2026, role=department
+- **Departments** (each has its own credentials):
+  - Academics:      academics@university.edu / acad@2026
+  - Facilities:     facilities@university.edu / facil@2026
+  - Hostel:         hostel@university.edu / hostel@2026
+  - Faculty:        faculty@university.edu / faculty@2026
+  - Administration: admin-dept@university.edu / admindept@2026
+  - Others:         others@university.edu / others@2026
+- JWT payload includes `department` field for department users
 - JWT stored in localStorage as 'token'
 
 ## Database Tables
 
-- `users` — id, name, email, password, role, created_at
+- `users` — id, name, email, password, role, department, created_at
 - `complaints` — id, student_id, title, description, category, department, status, created_at
 - `responses` — id, complaint_id, staff_id, message, created_at
 - `notifications` — id, user_id, complaint_id, message, is_read, created_at
