@@ -15,5 +15,6 @@ export const CreateComplaintRequestCategory = {
   Hostel: "Hostel",
   Faculty: "Faculty",
   Administration: "Administration",
-  Others: "Others",
+  ExaminationBranch: "Examination Branch",
+  Sports: "Sports",
 } as const;

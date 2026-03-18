@@ -5,7 +5,7 @@ import { sql } from "drizzle-orm";
 
 const router = Router();
 
-router.get("/analytics", authenticate, requireRole("admin"), async (_req, res) => {
+router.get("/analytics", authenticate, requireRole("admin", "hod"), async (_req, res) => {
   try {
     const all = await db.select().from(complaintsTable);
 

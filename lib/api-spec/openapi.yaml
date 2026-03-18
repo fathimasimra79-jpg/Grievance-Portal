@@ -489,7 +489,7 @@ components:
           type: string
         category:
           type: string
-          enum: [Academics, Facilities, Hostel, Faculty, Administration, Others]
+          enum: [Academics, Facilities, Hostel, Faculty, Administration, Examination Branch, Sports]
       required:
         - title
         - description
@@ -503,7 +503,7 @@ components:
           enum: [Pending, In Review, In Progress, Resolved]
         department:
           type: string
-          enum: [Academics, Facilities, Hostel, Faculty, Administration, Others]
+          enum: [Academics, Facilities, Hostel, Faculty, Administration, Examination Branch, Sports]
 
     Complaint:
       type: object

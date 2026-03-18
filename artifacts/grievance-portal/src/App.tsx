@@ -14,6 +14,7 @@ import StudentDashboard from "@/pages/student/Dashboard";
 import NewComplaint from "@/pages/student/NewComplaint";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import DepartmentDashboard from "@/pages/department/Dashboard";
+import HodDashboard from "@/pages/hod/Dashboard";
 
 // Shared detail view
 import ComplaintDetail from "@/pages/shared/ComplaintDetail";
@@ -43,7 +44,7 @@ function Router() {
       </Route>
       <Route path="/student/register" component={Register} />
 
-      {/* Protected Routes inside Layout */}
+      {/* Student Routes */}
       <Route path="/student/dashboard">
         {() => <Layout><StudentDashboard /></Layout>}
       </Route>
@@ -53,7 +54,8 @@ function Router() {
       <Route path="/student/complaint/:id">
         {() => <Layout><ComplaintDetail /></Layout>}
       </Route>
-      
+
+      {/* Admin Routes */}
       <Route path="/admin/dashboard">
         {() => <Layout><AdminDashboard /></Layout>}
       </Route>
@@ -61,10 +63,19 @@ function Router() {
         {() => <Layout><ComplaintDetail /></Layout>}
       </Route>
 
+      {/* Department Routes */}
       <Route path="/department/dashboard">
         {() => <Layout><DepartmentDashboard /></Layout>}
       </Route>
       <Route path="/department/complaint/:id">
+        {() => <Layout><ComplaintDetail /></Layout>}
+      </Route>
+
+      {/* HOD Routes */}
+      <Route path="/hod/dashboard">
+        {() => <Layout><HodDashboard /></Layout>}
+      </Route>
+      <Route path="/hod/complaint/:id">
         {() => <Layout><ComplaintDetail /></Layout>}
       </Route>
 

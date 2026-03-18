@@ -9,17 +9,22 @@ const router = Router();
 const ADMIN_EMAIL = "admin@university.edu";
 const ADMIN_PASSWORD = "admin@2026";
 
-// Per-department credentials: email → { password, departmentName, displayName }
-const DEPARTMENT_CREDENTIALS: Record<string, { password: string; department: string; name: string }> = {
-  "academics@university.edu":   { password: "acad@2026",      department: "Academics",      name: "Academics Department" },
-  "facilities@university.edu":  { password: "facil@2026",     department: "Facilities",     name: "Facilities Department" },
-  "hostel@university.edu":      { password: "hostel@2026",    department: "Hostel",         name: "Hostel Department" },
-  "faculty@university.edu":     { password: "faculty@2026",   department: "Faculty",        name: "Faculty Affairs" },
-  "admin-dept@university.edu":  { password: "admindept@2026", department: "Administration", name: "Administration Department" },
-  "others@university.edu":      { password: "others@2026",    department: "Others",         name: "Others Department" },
+// HOD credentials (global access across all departments)
+const HOD_CREDENTIALS: Record<string, { password: string; name: string }> = {
+  "hod@university.edu": { password: "hod@2026", name: "Head of Departments" },
 };
 
-// Seed all system users (admin + departments) on first use
+// Per-department credentials: email → { password, departmentName, displayName }
+const DEPARTMENT_CREDENTIALS: Record<string, { password: string; department: string; name: string }> = {
+  "academics@university.edu":  { password: "acad@2026",      department: "Academics",          name: "Academics Department" },
+  "facilities@university.edu": { password: "facil@2026",     department: "Facilities",         name: "Facilities Department" },
+  "hostel@university.edu":     { password: "hostel@2026",    department: "Hostel",             name: "Hostel Department" },
+  "faculty@university.edu":    { password: "faculty@2026",   department: "Faculty",            name: "Faculty Affairs" },
+  "admin-dept@university.edu": { password: "admindept@2026", department: "Administration",     name: "Administration Department" },
+  "exam@university.edu":       { password: "exam@2026",      department: "Examination Branch", name: "Examination Branch" },
+  "sports@university.edu":     { password: "sports@2026",    department: "Sports",             name: "Sports Department" },
+};
+
 async function ensureSystemUser(
   email: string,
   password: string,
@@ -55,11 +60,7 @@ router.post("/register", async (req, res) => {
     }
     const hashed = await hashPassword(password);
     const [user] = await db.insert(usersTable).values({
-      name,
-      email,
-      password: hashed,
-      role: "student",
-      department: null,
+      name, email, password: hashed, role: "student", department: null,
     }).returning();
     const token = signToken({ id: user.id, email: user.email, role: user.role, name: user.name });
     return res.status(201).json({
@@ -89,14 +90,27 @@ router.post("/login", async (req, res) => {
       return res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: "admin", department: null } });
     }
 
-    // --- Department login ---
+    // --- Department / HOD login ---
     if (role === "department") {
-      const cred = DEPARTMENT_CREDENTIALS[email.toLowerCase()];
+      const emailLower = email.toLowerCase();
+
+      // Check HOD first
+      const hodCred = HOD_CREDENTIALS[emailLower];
+      if (hodCred) {
+        if (password !== hodCred.password) {
+          return res.status(401).json({ error: "Invalid HOD credentials" });
+        }
+        const user = await ensureSystemUser(emailLower, hodCred.password, hodCred.name, "hod");
+        const token = signToken({ id: user.id, email: user.email, role: "hod", name: user.name });
+        return res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: "hod", department: null } });
+      }
+
+      // Check per-department credentials
+      const cred = DEPARTMENT_CREDENTIALS[emailLower];
       if (!cred || password !== cred.password) {
         return res.status(401).json({ error: "Invalid department credentials" });
       }
-      const user = await ensureSystemUser(email.toLowerCase(), cred.password, cred.name, "department", cred.department);
-      // Always sync department in case row already existed without it
+      const user = await ensureSystemUser(emailLower, cred.password, cred.name, "department", cred.department);
       if (!user.department) {
         await db.update(usersTable).set({ department: cred.department }).where(eq(usersTable.id, user.id));
         user.department = cred.department;

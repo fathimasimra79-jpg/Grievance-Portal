@@ -1,0 +1,110 @@
+Update the existing **Student Grievance Redressal System** with the following changes:
+
+---
+
+1. REMOVE DEPARTMENT
+
+Remove the "Others" department completely from:
+
+• Database
+• Login system
+• Dropdowns
+• APIs
+
+---
+
+2. ADD NEW DEPARTMENTS
+
+Add the following departments:
+
+• Examination Branch
+• Sports
+
+---
+
+3. ADD HOD ROLE
+
+Add a new role:
+
+• HOD (global access across all departments)
+
+---
+
+4. UPDATED LOGIN CREDENTIALS
+
+Use the following predefined credentials:
+
+Academics
+Email: [academics@university.edu](mailto:academics@university.edu)
+Password: acad@2026
+
+Facilities
+Email: [facilities@university.edu](mailto:facilities@university.edu)
+Password: facil@2026
+
+Hostel
+Email: [hostel@university.edu](mailto:hostel@university.edu)
+Password: hostel@2026
+
+Faculty
+Email: [faculty@university.edu](mailto:faculty@university.edu)
+Password: faculty@2026
+
+Administration
+Email: [admin-dept@university.edu](mailto:admin-dept@university.edu)
+Password: admindept@2026
+
+Examination Branch
+Email: [exam@university.edu](mailto:exam@university.edu)
+Password: exam@2026
+
+Sports
+Email: [sports@university.edu](mailto:sports@university.edu)
+Password: sports@2026
+
+HOD (Global Access)
+Email: [hod@university.edu](mailto:hod@university.edu)
+Password: hod@2026
+
+---
+
+5. ROLE-BASED ACCESS
+
+• Department users → see only their department complaints
+• HOD → see ALL complaints
+• Admin → full control
+
+---
+
+6. UPDATE DROPDOWNS
+
+Ensure complaint category / assignment dropdown includes:
+
+• Academics
+• Facilities
+• Hostel
+• Faculty
+• Administration
+• Examination Branch
+• Sports
+
+---
+
+7. VALIDATION
+
+• No "Others" anywhere
+• Department must be selected
+• HOD should not be treated as a department
+
+---
+
+8. NOTIFICATION SYSTEM
+
+• Student submits → Admin notified
+• Admin assigns → Department notified
+• Department updates → HOD notified
+• HOD approves → Student notified
+
+---
+
+Ensure all frontend UI, backend APIs, and database logic reflect these updates correctly.

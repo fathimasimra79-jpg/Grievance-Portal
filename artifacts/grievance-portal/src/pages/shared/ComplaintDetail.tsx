@@ -89,7 +89,8 @@ export default function ComplaintDetail() {
   };
 
   const backLink = user?.role === 'student' ? '/student/dashboard' : 
-                   user?.role === 'admin' ? '/admin/dashboard' : '/department/dashboard';
+                   user?.role === 'admin' ? '/admin/dashboard' :
+                   user?.role === 'hod' ? '/hod/dashboard' : '/department/dashboard';
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-12">
@@ -148,6 +149,23 @@ export default function ComplaintDetail() {
           {user?.role === 'department' && (
             <div className="flex flex-col gap-2 min-w-[200px] bg-background p-3 rounded-xl border shadow-sm">
               <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Update Status</p>
+              <select 
+                className="text-sm rounded-md border p-2 focus:ring-2 focus:ring-primary/20 outline-none"
+                value={complaint.status}
+                onChange={(e) => handleUpdateStatus(e.target.value as UpdateComplaintRequestStatus)}
+                disabled={updateMutation.isPending}
+              >
+                {Object.values(UpdateComplaintRequestStatus).map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* HOD Controls */}
+          {user?.role === 'hod' && (
+            <div className="flex flex-col gap-2 min-w-[200px] bg-background p-3 rounded-xl border shadow-sm">
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">HOD Controls</p>
               <select 
                 className="text-sm rounded-md border p-2 focus:ring-2 focus:ring-primary/20 outline-none"
                 value={complaint.status}
@@ -221,7 +239,7 @@ export default function ComplaintDetail() {
         )}
 
         {/* Add Response Form (Admin/Dept only) */}
-        {(user?.role === 'admin' || user?.role === 'department') && complaint.status !== 'Resolved' && (
+        {(user?.role === 'admin' || user?.role === 'department' || user?.role === 'hod') && complaint.status !== 'Resolved' && (
           <Card className="mt-6 border-primary/20 shadow-md">
             <form onSubmit={handleAddResponse} className="p-4">
               <Textarea 

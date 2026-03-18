@@ -33,6 +33,7 @@ export function useAuth() {
         
         // Redirect based on role
         if (data.user.role === 'admin') setLocation("/admin/dashboard");
+        else if (data.user.role === 'hod') setLocation("/hod/dashboard");
         else if (data.user.role === 'department') setLocation("/department/dashboard");
         else setLocation("/student/dashboard");
       },

@@ -29,7 +29,7 @@ router.get("/", authenticate, async (req: AuthRequest, res) => {
   }
 });
 
-router.post("/", authenticate, requireRole("admin", "department"), async (req: AuthRequest, res) => {
+router.post("/", authenticate, requireRole("admin", "department", "hod"), async (req: AuthRequest, res) => {
   try {
     const user = req.user!;
     const complaintId = parseInt(req.params.id);

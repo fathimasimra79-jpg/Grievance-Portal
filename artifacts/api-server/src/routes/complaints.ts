@@ -19,6 +19,11 @@ async function getAdminId(): Promise<number | null> {
   return admins.length > 0 ? admins[0].id : null;
 }
 
+async function getHodId(): Promise<number | null> {
+  const hods = await db.select().from(usersTable).where(eq(usersTable.role, "hod")).limit(1);
+  return hods.length > 0 ? hods[0].id : null;
+}
+
 async function getDepartmentUserId(departmentName: string): Promise<number | null> {
   const deptUsers = await db.select()
     .from(usersTable)
@@ -51,17 +56,18 @@ router.get("/", authenticate, async (req: AuthRequest, res) => {
     let filtered = allComplaints;
 
     if (user.role === "student") {
-      // Students see only their own complaints
       filtered = filtered.filter(c => c.studentId === user.id);
     } else if (user.role === "department") {
-      // Department users see ONLY complaints assigned to their specific department
+      // Department users see ONLY their assigned department's complaints
       filtered = filtered.filter(c => c.department === user.department);
     }
-    // Admin sees all complaints (no filter)
+    // Admin and HOD see all complaints (no filter)
 
     if (status) filtered = filtered.filter(c => c.status === status);
     if (category) filtered = filtered.filter(c => c.category === category);
-    if (department && user.role === "admin") filtered = filtered.filter(c => c.department === department);
+    if (department && (user.role === "admin" || user.role === "hod")) {
+      filtered = filtered.filter(c => c.department === department);
+    }
 
     return res.json({ complaints: filtered, total: filtered.length });
   } catch (err) {
@@ -85,7 +91,7 @@ router.post("/", authenticate, requireRole("student"), async (req: AuthRequest, 
       status: "Pending",
     }).returning();
 
-    // Notify admin of new complaint
+    // Student submits → Admin notified
     const adminId = await getAdminId();
     if (adminId) {
       await notifyUser(adminId, `New complaint submitted: "${title}" by ${user.name}`, complaint.id);
@@ -128,7 +134,7 @@ router.get("/:id", authenticate, async (req: AuthRequest, res) => {
   }
 });
 
-router.patch("/:id", authenticate, requireRole("admin", "department"), async (req: AuthRequest, res) => {
+router.patch("/:id", authenticate, requireRole("admin", "department", "hod"), async (req: AuthRequest, res) => {
   try {
     const user = req.user!;
     const id = parseInt(req.params.id);
@@ -146,19 +152,28 @@ router.patch("/:id", authenticate, requireRole("admin", "department"), async (re
 
     const [updated] = await db.update(complaintsTable).set(updates).where(eq(complaintsTable.id, id)).returning();
 
-    // Notify department user when assigned
+    // Admin assigns department → notify department user + student
     if (department && department !== complaint.department) {
-      // Notify the specific department user
       const deptUserId = await getDepartmentUserId(department);
       if (deptUserId) {
         await notifyUser(deptUserId, `Complaint #${id} "${complaint.title}" has been assigned to your department.`, id);
       }
-      // Also notify the student
       await notifyUser(complaint.studentId, `Your complaint "${complaint.title}" has been assigned to the ${department} department.`, id);
     }
 
-    // Notify student on status change
-    if (status && status !== complaint.status) {
+    // Department updates status → HOD notified
+    if (status && status !== complaint.status && user.role === "department") {
+      const hodId = await getHodId();
+      if (hodId) {
+        await notifyUser(hodId, `Complaint #${id} "${complaint.title}" status updated to "${status}" by ${user.name}.`, id);
+      }
+    }
+
+    // HOD approves (resolves) → student notified
+    if (status && status !== complaint.status && user.role === "hod" && status === "Resolved") {
+      await notifyUser(complaint.studentId, `Your complaint "${complaint.title}" has been approved and resolved by the HOD. Please leave feedback.`, id);
+    } else if (status && status !== complaint.status) {
+      // General status change notification for student
       await notifyUser(complaint.studentId, `Your complaint "${complaint.title}" status updated to: ${status}`, id);
       if (status === "Resolved") {
         await notifyUser(complaint.studentId, `Your complaint "${complaint.title}" has been resolved! Please leave feedback.`, id);

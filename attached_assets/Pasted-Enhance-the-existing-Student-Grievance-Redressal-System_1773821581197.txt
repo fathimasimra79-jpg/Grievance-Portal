@@ -1,0 +1,98 @@
+Enhance the existing **Student Grievance Redressal System** by adding new departments and updating all related functionality.
+
+CURRENT DEPARTMENTS
+
+• Academics
+• Facilities
+• Hostel
+• Faculty
+
+---
+
+ADD NEW DEPARTMENTS
+
+Include the following additional departments:
+
+• Examination Branch
+• Sports
+• Administration
+
+---
+
+REQUIREMENTS
+
+1. Update all department-related dropdowns in the frontend (complaint submission form and admin assignment form) to include:
+
+• Academics
+• Facilities
+• Hostel
+• Faculty
+• Examination Branch
+• Sports
+• Administration
+
+---
+
+2. Update the backend logic to support these new departments.
+
+Ensure that when the admin assigns a complaint, the department field can store any of the above values.
+
+---
+
+3. Update the database (if needed)
+
+Ensure the **department field in the complaints table** supports all department values.
+
+---
+
+4. Department Login System
+
+Create login credentials for the new departments:
+
+Examination Branch
+Email: [exam@university.edu](mailto:exam@university.edu)
+Password: exam@2026
+
+Sports Department
+Email: [sports@university.edu](mailto:sports@university.edu)
+Password: sports@2026
+
+Administration
+Email: [adminoffice@university.edu](mailto:adminoffice@university.edu)
+Password: admin@2026
+
+---
+
+5. Department Dashboard Filtering
+
+Ensure each department can only see complaints assigned to them.
+
+Example:
+
+Examination Branch → show only complaints where
+department = "Examination Branch"
+
+Sports → show only complaints where
+department = "Sports"
+
+Administration → show only complaints where
+department = "Administration"
+
+---
+
+6. Notification System
+
+Ensure notifications work for new departments:
+
+• Admin assigns complaint → notify respective department
+• Department updates status → notify student
+
+---
+
+7. Ensure consistency
+
+Update all forms, APIs, validation, and UI components so the new departments appear correctly across the entire system.
+
+---
+
+The system should now fully support all departments with proper role-based complaint access.

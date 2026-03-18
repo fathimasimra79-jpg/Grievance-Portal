@@ -92,7 +92,8 @@ export const CreateComplaintBody = zod.object({
     "Hostel",
     "Faculty",
     "Administration",
-    "Others",
+    "Examination Branch",
+    "Sports",
   ]),
 });
 
@@ -159,7 +160,8 @@ export const UpdateComplaintBody = zod.object({
       "Hostel",
       "Faculty",
       "Administration",
-      "Others",
+      "Examination Branch",
+      "Sports",
     ])
     .optional(),
 });
